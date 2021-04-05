@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aspnet-core-on-kubernetes-storage
+  labels:
+    app: aspnet-core-on-kubernetes-storage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aspnet-core-on-kubernetes-storage
+  template:
+    metadata:
+      labels:
+        app: aspnet-core-on-kubernetes-storage
+    spec:
+      containers:
+      - name: aspnet-core-on-kubernetes-storage
+        image: raphaelcastilhoc/aspnet-core-on-kubernetes-storage:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aspnet-core-on-kubernetes-storage-service
+spec:
+ type: LoadBalancer
+ ports:
+ - port: 80
+ selector:
+   app: aspnet-core-on-kubernetes-storage
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: aspnet-core-on-kubernetes-storage-ingress
+  labels:
+    app: aspnet-core-on-kubernetes-storage-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: aspnet-core-on-kubernetes-storage-service
+          servicePort: 80
